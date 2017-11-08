@@ -8,7 +8,7 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 import h5py
 import scipy.io as sio
-
+import numpy as np
 import argparse
 import os
 import tensorflow as tf
@@ -28,8 +28,8 @@ parser.add_argument('--load_size', dest='load_size', type=int, default=32, help=
 parser.add_argument('--fine_size', dest='fine_size', type=int, default=28, help='then crop to this size')
 parser.add_argument('--ngf', dest='ngf', type=int, default=64, help='# of gen filters in first conv layer')
 parser.add_argument('--ndf', dest='ndf', type=int, default=64, help='# of discri filters in first conv layer')
-parser.add_argument('--input_nc', dest='input_nc', type=int, default=3, help='# of input image channels')
-parser.add_argument('--output_nc', dest='output_nc', type=int, default=3, help='# of output image channels')
+parser.add_argument('--input_nc', dest='input_nc', type=int, default=1, help='# of input image channels')
+parser.add_argument('--output_nc', dest='output_nc', type=int, default=1, help='# of output image channels')
 parser.add_argument('--lr', dest='lr', type=float, default=0.0002, help='initial learning rate for adam')
 parser.add_argument('--beta1', dest='beta1', type=float, default=0.5, help='momentum term of adam')
 parser.add_argument('--which_direction', dest='which_direction', default='AtoB', help='AtoB or BtoA')
@@ -136,11 +136,16 @@ print("begining cycle gan.....")
 
 with tf.Session(config=tfconfig) as sess:
     domain_adapation_model = cyclegan(sess, args)
-    x_test_c = domain_adapation_model.pix2pix_cylce_gan(args, x_test)
+    x_test_c = np.zeros(x_test.shape)
+    batch_size = 2
+    batch_num = int(x_test.shape[0]/batch_size)
+    for idx in range(batch_num):
+        print(idx)
+        x_test_c[idx*batch_size:(idx+1)*batch_size] = domain_adapation_model.pix2pix_cylce_gan(args, x_test[idx*batch_size:(idx+1)*batch_size])
     score = model.evaluate(x_test_c, y_test, verbose=0)
     print('svhn Test loss after cycle gan:', score[0])
     print('svhn Test accuracy after cycle gan:', score[1])
-    x_train_c = domain_adapation_model.pix2pix_cylce_gan(args, x_train)
-    score = model.evaluate(x_train_c, y_train, verbose=0)
-    print('svhn Train loss after cycle gan:', score[0])
-    print('svhn Train accuracy after cycle gan:', score[1])
+    #x_train_c = domain_adapation_model.pix2pix_cylce_gan(args, x_train)
+    #score = model.evaluate(x_train_c, y_train, verbose=0)
+    #print('svhn Train loss after cycle gan:', score[0])
+    #print('svhn Train accuracy after cycle gan:', score[1])
