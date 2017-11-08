@@ -64,22 +64,30 @@ def load_train_data(image_path, load_size=286, fine_size=256, is_testing=False):
 
     img_A = img_A/127.5 - 1.
     img_B = img_B/127.5 - 1.
+    if len(img_A.shape) < 3:
+        img_A = img_A.reshape(img_A.shape[0], img_A.shape[1], 1)
+        img_B = img_B.reshape(img_B.shape[0], img_B.shape[1], 1)
+    print(img_A.shape,img_B.shape)
 
     img_AB = np.concatenate((img_A, img_B), axis=2)
+    print(img_AB.shape)
     # img_AB shape: (fine_size, fine_size, input_c_dim + output_c_dim)
     return img_AB
 
 # -----------------------------
 
-def get_image(image_path, image_size, is_crop=True, resize_w=64, is_grayscale = False):
+def get_image(image_path, image_size, is_crop=True, resize_w=64, is_grayscale = True):
     return transform(imread(image_path, is_grayscale), image_size, is_crop, resize_w)
 
 def save_images(images, size, image_path):
     return imsave(inverse_transform(images), size, image_path)
 
-def imread(path, is_grayscale = False):
+def imread(path, is_grayscale = True):
     if (is_grayscale):
-        return scipy.misc.imread(path, flatten = True).astype(np.float)
+        img = scipy.misc.imread(path, flatten=True).astype(np.float)
+        #print(img.shape)
+
+        return img
     else:
         return scipy.misc.imread(path, mode='RGB').astype(np.float)
 
