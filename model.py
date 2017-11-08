@@ -264,3 +264,9 @@ class cyclegan(object):
                 '..' + os.path.sep + image_path)))
             index.write("</tr>")
         index.close()
+
+    def pix2pix_cylce_gan(self,args,data):
+        init_op = tf.global_variables_initializer()
+        self.sess.run(init_op)
+        fake_img = self.sess.run(self.testB, feed_dict={self.test_A: data})
+        return fake_img
