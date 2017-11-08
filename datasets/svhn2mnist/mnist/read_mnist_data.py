@@ -6,7 +6,12 @@ from keras.datasets import mnist
 import cv2 as cv
 import numpy as np
 
+import scipy.io as sio
+
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+sio.savemat('mnist_train_28x28.mat', {'X':x_train,'y':y_train})
+sio.savemat('mnist_test_28x28.mat', {'X':x_test,'y':y_test})
 
 root_dir = './'
 #data_home = '/home/data/OCR/SVHN' # server226
